@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
+import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,30 +16,26 @@ public class CallbackTest {
     private WebDriver driver;
 
     @BeforeAll
-    public static void setUpAll() {
-        System.setProperty("webdriver.chrome.driver","./driver/chromedriver.exe");
-
+    static void setupClass() {
+        WebDriverManager.chromedriver().setup();
     }
 
     @BeforeEach
-     public void setUp() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
+    void setupTest() {
+        driver = new ChromeDriver();
     }
+
     @AfterEach
-    public void tearDown() {
-        driver.quit();
-        driver=null;
+    void teardown() {
+        if (driver != null) {
+            driver.quit();
+        }
     }
     @Test
     public void shouldTestSomething() {
         driver.get("http://localhost:9999");
-        List<WebElement> elements = driver.findElements(By.className("input__control"));
-        elements.get(0).sendKeys("Василий");
-        elements.get(1).sendKeys("+79012345678");
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Иван Петров-Иванов");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79233212222");
         driver.findElement(By.className("checkbox__box")).click();
         driver.findElement(By.className("button")).click();
         String text = driver.findElement(By.cssSelector("[data-test-id=\"order-success\"]")).getText();
